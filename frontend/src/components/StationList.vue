@@ -3,7 +3,7 @@
     <div class="filters">
       <div class="filter-group">
         <label>Filter by Genre:</label>
-        <select v-model="selectedGenre" @change="filterStations">
+        <select v-model="selectedGenre">
           <option value="">All Genres</option>
           <option v-for="genre in genres" :key="genre" :value="genre">{{ genre }}</option>
         </select>
@@ -11,7 +11,7 @@
       
       <div class="filter-group">
         <label>Filter by Country:</label>
-        <select v-model="selectedCountry" @change="filterStations">
+        <select v-model="selectedCountry">
           <option value="">All Countries</option>
           <option v-for="country in countries" :key="country" :value="country">{{ country }}</option>
         </select>
@@ -96,9 +96,6 @@ export default {
   methods: {
     selectStation(station) {
       this.$emit('select-station', station);
-    },
-    filterStations() {
-      // Filters are computed, so this just triggers reactivity if needed
     }
   }
 }

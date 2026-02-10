@@ -1,11 +1,18 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
-const Station = require('./models/Station');
+const express = require('express');
+const cors = require('cors');
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/internet-radio';
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-const sampleStations = [
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// In-memory storage for development/demo (replace with MongoDB in production)
+let stations = [
   {
+    _id: '1',
     name: 'BBC Radio 1',
     streamUrl: 'http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one',
     country: 'United Kingdom',
@@ -16,6 +23,7 @@ const sampleStations = [
     bitrate: '128kbps'
   },
   {
+    _id: '2',
     name: 'NPR News',
     streamUrl: 'https://npr-ice.streamguys1.com/live.mp3',
     country: 'United States',
@@ -26,6 +34,7 @@ const sampleStations = [
     bitrate: '128kbps'
   },
   {
+    _id: '3',
     name: 'Radio Paradise',
     streamUrl: 'https://stream.radioparadise.com/aac-320',
     country: 'United States',
@@ -36,6 +45,7 @@ const sampleStations = [
     bitrate: '320kbps'
   },
   {
+    _id: '4',
     name: 'France Inter',
     streamUrl: 'https://icecast.radiofrance.fr/franceinter-midfi.mp3',
     country: 'France',
@@ -46,6 +56,7 @@ const sampleStations = [
     bitrate: '128kbps'
   },
   {
+    _id: '5',
     name: 'KEXP',
     streamUrl: 'https://kexp-mp3-128.streamguys1.com/kexp128.mp3',
     country: 'United States',
@@ -56,6 +67,7 @@ const sampleStations = [
     bitrate: '128kbps'
   },
   {
+    _id: '6',
     name: 'Radio Swiss Jazz',
     streamUrl: 'http://stream.srg-ssr.ch/m/rsj/mp3_128',
     country: 'Switzerland',
@@ -66,6 +78,7 @@ const sampleStations = [
     bitrate: '128kbps'
   },
   {
+    _id: '7',
     name: 'Deutschlandfunk',
     streamUrl: 'https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3',
     country: 'Germany',
@@ -76,6 +89,7 @@ const sampleStations = [
     bitrate: '128kbps'
   },
   {
+    _id: '8',
     name: 'SomaFM - Groove Salad',
     streamUrl: 'https://somafm.com/groovesalad130.pls',
     country: 'United States',
@@ -86,6 +100,7 @@ const sampleStations = [
     bitrate: '130kbps'
   },
   {
+    _id: '9',
     name: 'ABC Classic',
     streamUrl: 'https://live-radio01.mediahubaustralia.com/2CLW/mp3/',
     country: 'Australia',
@@ -96,6 +111,7 @@ const sampleStations = [
     bitrate: '128kbps'
   },
   {
+    _id: '10',
     name: 'NHK Radio Japan',
     streamUrl: 'http://radiostream.nhk.or.jp/hls/live/2023229/nhkradiruakr1/master.m3u8',
     country: 'Japan',
@@ -107,25 +123,81 @@ const sampleStations = [
   }
 ];
 
-async function seedDatabase() {
-  try {
-    await mongoose.connect(MONGODB_URI);
-    console.log('Connected to MongoDB');
+// API Routes
+// Get all stations
+app.get('/api/stations', (req, res) => {
+  res.json(stations.sort((a, b) => a.name.localeCompare(b.name)));
+});
 
-    // Clear existing stations
-    await Station.deleteMany({});
-    console.log('Cleared existing stations');
+// Get stations by country
+app.get('/api/stations/country/:country', (req, res) => {
+  const filtered = stations.filter(s => s.country === req.params.country);
+  res.json(filtered);
+});
 
-    // Insert sample stations
-    await Station.insertMany(sampleStations);
-    console.log('Sample stations added successfully');
+// Get stations by genre
+app.get('/api/stations/genre/:genre', (req, res) => {
+  const filtered = stations.filter(s => s.genre === req.params.genre);
+  res.json(filtered);
+});
 
-    mongoose.connection.close();
-    console.log('Database connection closed');
-  } catch (error) {
-    console.error('Error seeding database:', error);
-    process.exit(1);
+// Get single station
+app.get('/api/stations/:id', (req, res) => {
+  const station = stations.find(s => s._id === req.params.id);
+  if (!station) {
+    return res.status(404).json({ message: 'Station not found' });
   }
-}
+  res.json(station);
+});
 
-seedDatabase();
+// Create new station
+app.post('/api/stations', (req, res) => {
+  const newStation = {
+    _id: String(stations.length + 1),
+    name: req.body.name,
+    streamUrl: req.body.streamUrl,
+    country: req.body.country,
+    genre: req.body.genre,
+    description: req.body.description || '',
+    imageUrl: req.body.imageUrl || '',
+    language: req.body.language || 'English',
+    bitrate: req.body.bitrate || '128kbps'
+  };
+  stations.push(newStation);
+  res.status(201).json(newStation);
+});
+
+// Update station
+app.put('/api/stations/:id', (req, res) => {
+  const index = stations.findIndex(s => s._id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ message: 'Station not found' });
+  }
+  
+  stations[index] = { ...stations[index], ...req.body, _id: stations[index]._id };
+  res.json(stations[index]);
+});
+
+// Delete station
+app.delete('/api/stations/:id', (req, res) => {
+  const index = stations.findIndex(s => s._id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ message: 'Station not found' });
+  }
+  
+  stations.splice(index, 1);
+  res.json({ message: 'Station deleted' });
+});
+
+// Root route
+app.get('/', (req, res) => {
+  res.json({ message: 'Internet Radio API Server - In-Memory Mode' });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  console.log('Using in-memory storage (no MongoDB required)');
+});
+
+module.exports = app;

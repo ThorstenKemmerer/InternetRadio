@@ -57,6 +57,24 @@ npm install
 
 ## Running the Application
 
+### Quick Start (No MongoDB Required)
+
+For quick testing without MongoDB, you can use the standalone mode with in-memory storage:
+
+```bash
+# Terminal 1 - Backend with in-memory storage
+cd backend
+npm run start:standalone
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
+```
+
+Then visit `http://localhost:5173` in your browser.
+
+### Full Stack with MongoDB
+
 ### 1. Start MongoDB
 
 Make sure MongoDB is running on your system:
