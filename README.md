@@ -21,79 +21,78 @@ A full-stack web application for listening to internet radio streams from around
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
-- Node.js (v14 or higher)
-- MongoDB (v4.4 or higher)
-- npm or yarn
+# InternetRadio
 
-## Installation
+InternetRadio is a small full-stack app for browsing and listening to internet radio stations. It uses a Vue 3 + Vite frontend and an Express + MongoDB backend.
 
-### 1. Clone the repository
+Quick links
+- Frontend dev: `cd frontend && npm run dev`
+- Backend dev: `cd backend && npm run dev`
+- Seed sample data: `cd backend && npm run seed`
 
-```bash
-git clone https://github.com/ThorstenKemmerer/InternetRadio.git
-cd InternetRadio
-```
+Prerequisites
+- Node.js (14+), npm
+- MongoDB (for full-stack mode)
 
-### 2. Set up the Backend
+Quickstart (standalone, no MongoDB)
+1. Start backend in standalone mode (in-memory):
 
 ```bash
 cd backend
 npm install
-```
-
-Create a `.env` file in the backend directory:
-```
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/internet-radio
-NODE_ENV=development
-```
-
-### 3. Set up the Frontend
-
-```bash
-cd ../frontend
-npm install
-```
-
-## Running the Application
-
-### Quick Start (No MongoDB Required)
-
-For quick testing without MongoDB, you can use the standalone mode with in-memory storage:
-
-```bash
-# Terminal 1 - Backend with in-memory storage
-cd backend
 npm run start:standalone
+```
 
-# Terminal 2 - Frontend
+2. Start frontend:
+
+```bash
 cd frontend
+npm install
 npm run dev
 ```
 
-Then visit `http://localhost:5173` in your browser.
+Open the app at http://localhost:5173
 
-### Full Stack with MongoDB
-
-### 1. Start MongoDB
-
-Make sure MongoDB is running on your system:
-```bash
-# On Linux/Mac
-mongod
-
-# On Windows (if MongoDB is installed as a service)
-net start MongoDB
-```
-
-### 2. Seed the Database (First time only)
+Full stack (with MongoDB)
+1. Ensure MongoDB is running locally or set `MONGODB_URI` in `backend/.env` (example in `backend/.env.example`).
+2. Install and seed:
 
 ```bash
 cd backend
+npm install
 npm run seed
+npm run dev
+```
+3. Start the frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-This will populate the database with sample radio stations from around the world.
+API (default base `http://localhost:3000`)
+- `GET /api/stations` — list stations
+- `GET /api/stations/:id` — station detail
+- `POST /api/stations` — add station
+- `PUT /api/stations/:id` — update station
+- `DELETE /api/stations/:id` — remove station
+
+Project layout (important files)
+- `backend/` — Express server, Mongoose models (`models/Station.js`), routes (`routes/stations.js`)
+- `backend/seed.js` — sample data seeding script
+- `frontend/` — Vue 3 + Vite app; main UI components in `frontend/src/components`
+
+Contributing
+- Use Conventional Commits: `feat:`, `fix:`, `chore:`, `docs:`.
+- Keep PRs small and include manual verification steps.
+
+Tips
+- If frontend can't reach the API, check `backend` is running and `MONGODB_URI` (when using full stack).
+
+License
+- MIT — see LICENSE
+
 
 ### 3. Start the Backend Server
 
