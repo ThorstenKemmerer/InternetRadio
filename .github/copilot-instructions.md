@@ -7,33 +7,60 @@ Preferred languages & tools
 - Primary: JavaScript (ES2020+), Vue 3, Node.js.
 - Tooling: Vite (frontend), Express + Mongoose (backend), npm.
 
+```instructions
+# Copilot instructions
+
+Project context
+- InternetRadio: Vue 3 (Vite) frontend + Express + Mongoose backend serving a radio-station list and player.
+
+Preferred languages & tools
+- Primary: JavaScript (ES2020+), Vue 3, Node.js
+- Tooling: Vite, Express, Mongoose, npm
+
 Code style
-- Follow ESLint + Prettier conventions (not yet included). Keep code small and focused.
-- JS style: `camelCase` for vars/funcs, `PascalCase` for classes and Vue components, kebab-case allowed for non-component filenames.
+- Follow ESLint + Prettier (not yet added). Keep changes small and focused.
+- JS: `camelCase` for variables/functions, `PascalCase` for classes and Vue components. Non-component filenames: `kebab-case`.
 
-Testing commands (repo-specific TODOs)
-- Frontend dev: `cd frontend && npm run dev`
-- Backend dev: `cd backend && npm run dev`
-- Tests: TODO (no test runner configured yet — please add `npm test`/`npm run test`)
-- Lint: TODO (add `npm run lint` after ESLint is added)
+Quick dev commands
+- Frontend dev: `cd frontend && npm install && npm run dev`
+- Backend dev: `cd backend && npm install && npm run dev`
+- Backend standalone: `cd backend && npm run start:standalone`
+- Seed sample data: `cd backend && npm run seed`
 
-Branch & commit naming
-- Branches: `feature/short-description`, `fix/short-description`, `chore/short-desc`.
-- Commits: follow Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`). Keep messages clear and reference issue IDs when present.
+Tests & lint
+- Status: no test runner or lint scripts yet. Recommended: add `vitest` or `jest`, and `eslint` + `prettier`.
+
+Branching & commits
+- Branches: `feature/short-description`, `fix/short-description`, `chore/short-desc`
+- Commits: use Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`)
 
 PR expectations
-- Small, focused PRs with a descriptive title and summary.
-- Include manual test steps and any setup required (env vars, DB seed).
-- Link related issue and list files changed. Address review comments promptly.
+- Small, focused PRs with a clear title and manual verification steps.
+- Include related issue link and list of changed files.
 
-Do / Don't rules for Copilot suggestions
+Agent / Copilot rules
 - Do:
-  - Suggest concise, self-contained changes that follow the project's style.
-  - Offer tests or instructions when changing behavior.
-  - Prefer using existing project dependencies and patterns.
+  - Propose concise, self-contained changes that follow the project's style.
+  - Include tests or manual verification steps when behavior changes.
+  - Prefer existing dependencies and patterns in the repo.
+  - When a change affects multiple areas, create a short plan and track it with `manage_todo_list`.
+
 - Don't:
   - Add large features or new dependencies without maintainer approval.
-  - Introduce secrets, credentials, or environment values in code.
-  - Modify unrelated files or rewrite the repo layout silently.
+  - Commit secrets, credentials, or environment values.
+  - Make wide refactors or modify unrelated files silently.
 
-If you'd like, I can scaffold ESLint/Prettier, a basic test runner, and a CI workflow next — say the word.
+Editing & automation guidance
+- Use `apply_patch` to edit files. Keep patches minimal and focused.
+- Run local dev servers to verify changes (`npm run dev` in each package).
+- When adding tests or linters, expose `npm test` and `npm run lint` scripts.
+
+Where to look
+- Backend: `backend/` (server, models, routes, `seed.js`)
+- Frontend: `frontend/` (Vite + Vue app, `src/components`)
+
+Next steps suggestions
+- Offer to scaffold ESLint/Prettier, `vitest` config, and a simple GitHub Actions CI workflow if requested.
+
+Keep this file brief and update as tooling is added.
+```
