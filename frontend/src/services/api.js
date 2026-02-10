@@ -1,6 +1,9 @@
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Default to a relative `/api` during development so Vite's proxy forwards requests
+// to the backend when running inside a dev container. In production or when a
+// custom API URL is provided, `VITE_API_URL` will be used.
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api' : 'http://localhost:3000/api');
 
 export const stationService = {
   async getAllStations() {
