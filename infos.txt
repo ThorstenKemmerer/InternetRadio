@@ -1,0 +1,30 @@
+infos
+
+---
+
+CORS = browser-enforced Same-Origin Policy: a web page at origin (scheme+host+port) is blocked from reading responses from a different origin unless the server includes appropriate Access-Control-Allow-* headers. Non-simple requests trigger a preflight OPTIONS request first.
+
+Host-address (network) issue: localhost inside a container is the container itself, not the host machine. A server bound only to localhost (127.0.0.1) inside a container isn't reachable from outside the container. To accept external connections bind to 0.0.0.0 or use container/host networking (host.docker.internal from some Docker setups).
+
+How these combine and why you saw a blank page
+
+If the frontend can’t reach the backend (connection refused or timeout) the app may fail to load data and render blank.
+If the frontend does reach a backend on a different origin but that backend doesn’t set Access-Control-Allow-Origin, the browser blocks the responses (CORS) and the app fails.
+Running in a dev container often introduces both problems: wrong host binding (network unreachable) and cross-origin requests (different origin → CORS).
+
+Why the changes fixed it
+
+server.host = '0.0.0.0' lets Vite serve the app on the container’s external interface so the browser can load it.
+Using a relative /api in development lets Vite’s dev-server proxy forward API calls to the backend while the browser sees the same origin (no CORS), avoiding both reachability and CORS friction.
+
+Other ways to fix or diagnose
+
+Enable CORS on the backend (Node/Express quick example):
+npm install cors
+In server.js: const cors = require('cors'); app.use(cors());
+Or point the frontend at the host backend explicitly (from inside container use http://host.docker.internal:3000/api or the host IP).
+Verify in browser DevTools: Network tab (connection errors / blocked by CORS) and Console (CORS error messages are explicit).
+If you want, I can add a short README note with recommended VITE_API_URL examples and the cors snippet.
+
+---
+
