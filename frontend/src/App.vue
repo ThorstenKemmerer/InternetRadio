@@ -1,11 +1,11 @@
 <template>
-  <div id="app">
-    <header class="app-header">
-      <h1>🎵 Internet Radio</h1>
-      <p>Listen to radio streams from around the world</p>
+  <div id="app" class="mx-auto max-w-6xl px-5">
+    <header class="text-center mb-10 py-8">
+      <h1 class="text-5xl font-extrabold gradient-text mb-2">🎵 Internet Radio</h1>
+      <p class="text-gray-600 text-lg">Listen to radio streams from around the world</p>
     </header>
 
-    <main class="app-main">
+    <main class="mb-10">
       <RadioPlayer 
         :currentStation="currentStation"
       />
@@ -18,8 +18,8 @@
       />
     </main>
 
-    <footer class="app-footer">
-      <p>Internet Radio App • Built with MEVN Stack (MongoDB, Express, Vue, Node.js)</p>
+    <footer class="text-center py-5 text-gray-500 border-t border-gray-200 mt-10">
+      <p class="text-sm">Internet Radio App • Built with MEVN Stack (MongoDB, Express, Vue, Node.js)</p>
     </footer>
   </div>
 </template>
@@ -69,58 +69,4 @@ export default {
 }
 </script>
 
-<style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: linear-gradient(to bottom, #f7f8fc 0%, #e9ecef 100%);
-  min-height: 100vh;
-}
-
-#app {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.app-header {
-  text-align: center;
-  margin-bottom: 40px;
-  padding: 30px 0;
-}
-
-.app-header h1 {
-  font-size: 48px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 10px;
-}
-
-.app-header p {
-  color: #666;
-  font-size: 18px;
-}
-
-.app-main {
-  margin-bottom: 40px;
-}
-
-.app-footer {
-  text-align: center;
-  padding: 20px;
-  color: #999;
-  border-top: 1px solid #ddd;
-  margin-top: 40px;
-}
-
-.app-footer p {
-  font-size: 14px;
-}
-</style>
+<!-- Styles migrated to src/index.css (Tailwind + small custom rules) -->
