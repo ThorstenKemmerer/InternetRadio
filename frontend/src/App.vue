@@ -1,8 +1,10 @@
 <template>
   <div id="app" class="mx-auto max-w-6xl px-5">
+    <div class="scanline-overlay"></div>
     <header class="text-center mb-10 py-8">
-      <h1 class="text-5xl font-extrabold gradient-text mb-2">🎵 Internet Radio</h1>
-      <p class="text-gray-600 text-lg">Listen to radio streams from around the world</p>
+      <img src="/src/assets/neon-logo.svg" alt="Neon Logo" class="mx-auto w-40 mb-4" />
+      <h1 class="text-5xl font-extrabold neon-heading neon-text mb-2">🎵 Internet Radio</h1>
+      <p class="text-neon-cyan opacity-90 text-lg">Listen to radio streams from around the world</p>
     </header>
 
     <main class="mb-10">

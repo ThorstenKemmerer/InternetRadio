@@ -1,10 +1,10 @@
 <template>
-  <div class="radio-player">
+  <div class="radio-player neon-card p-4 rounded-lg">
     <div class="player-info" v-if="currentStation">
-      <img v-if="currentStation.imageUrl" :src="currentStation.imageUrl" :alt="currentStation.name" class="w-32 h-32 object-cover rounded-md shadow-md" />
+      <img v-if="currentStation.imageUrl" :src="currentStation.imageUrl" :alt="currentStation.name" class="w-32 h-32 object-cover rounded-md shadow-md neon-glow" />
       <div class="station-details ml-4">
-        <h2 class="text-2xl font-semibold text-white">{{ currentStation.name }}</h2>
-        <p class="text-sm uppercase tracking-wide opacity-90">{{ currentStation.genre }} • {{ currentStation.country }}</p>
+        <h2 class="text-2xl font-semibold neon-text">{{ currentStation.name }}</h2>
+        <p class="text-sm uppercase tracking-wide opacity-90 text-neon-magenta">{{ currentStation.genre }} • {{ currentStation.country }}</p>
         <p class="mt-2 text-sm opacity-80">{{ currentStation.description }}</p>
       </div>
     </div>
@@ -12,7 +12,7 @@
     <div class="player-controls flex items-center gap-4 flex-wrap mt-4">
       <audio ref="audioPlayer" :src="currentStation?.streamUrl" @error="handleError"></audio>
       
-      <button @click="togglePlay" class="bg-white text-indigo-600 rounded-full px-6 py-3 font-bold shadow-md hover:-translate-y-1 transition transform">
+      <button @click="togglePlay" class="neon-btn font-bold hover:neon-glow transition transform">
         {{ isPlaying ? '⏸ Pause' : '▶ Play' }}
       </button>
       

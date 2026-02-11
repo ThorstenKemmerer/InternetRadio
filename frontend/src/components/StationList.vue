@@ -24,8 +24,8 @@
       <div
         v-for="station in filteredStations"
         :key="station._id"
-        class="station-card bg-white rounded-lg p-4 cursor-pointer transition transform hover:-translate-y-1 hover:shadow-lg border"
-        :class="{ '!border-indigo-400 bg-indigo-50/40': currentStation?._id === station._id }"
+        class="station-card neon-card p-4 cursor-pointer transition transform hover:-translate-y-1 hover:shadow-lg border border-transparent"
+        :class="{ '!border-neon-magenta bg-[rgba(255,45,149,0.04)]': currentStation?._id === station._id }"
         @click="selectStation(station)">
         <div class="station-card-image w-full h-36 mb-3 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
           <img v-if="station.imageUrl" :src="station.imageUrl" :alt="station.name" class="w-full h-full object-cover" />
@@ -34,7 +34,7 @@
         <div class="station-card-content">
           <h3 class="text-lg font-semibold text-gray-800">{{ station.name }}</h3>
           <p class="station-meta flex gap-2 mt-2 flex-wrap">
-            <span class="genre-badge bg-indigo-600 text-white px-2 py-0.5 rounded-full text-xs font-bold">{{ station.genre }}</span>
+            <span class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold">{{ station.genre }}</span>
             <span class="country-flag text-gray-600 text-sm">{{ station.country }}</span>
           </p>
           <p class="station-language text-sm text-gray-500 mt-2">{{ station.language }} • {{ station.bitrate }}</p>
