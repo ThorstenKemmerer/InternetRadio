@@ -2,10 +2,10 @@
   <div class="station-list">
     <div class="filters flex gap-4 mb-4 flex-wrap">
       <div class="filter-group flex flex-col gap-2 flex-1 min-w-[200px]">
-        <label class="font-semibold text-gray-700">Filter by Genre:</label>
-        <select v-model="selectedGenre" class="p-2 border rounded-md">
-          <option value="">All Genres</option>
-          <option v-for="genre in genres" :key="genre" :value="genre">{{ genre }}</option>
+        <label class="font-semibold text-gray-700">Filter by Tag:</label>
+        <select v-model="selectedTag" class="p-2 border rounded-md">
+          <option value="">All Tags</option>
+          <option v-for="tag in tags" :key="tag" :value="tag">{{ tag }}</option>
         </select>
       </div>
 
@@ -13,7 +13,7 @@
         <label class="font-semibold text-gray-700">Filter by Country:</label>
         <select v-model="selectedCountry" class="p-2 border rounded-md">
           <option value="">All Countries</option>
-          <option v-for="country in countries" :key="country" :value="country">{{ country }}</option>
+          <option v-for="country in countries" :key="country" :value="country">{{ getCountryLabel(country) }}</option>
         </select>
       </div>
     </div>
@@ -23,21 +23,29 @@
     <div v-else class="stations-grid grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       <div
         v-for="station in filteredStations"
-        :key="station._id"
+        :key="station.stationuuid"
         class="station-card neon-card p-4 cursor-pointer transition transform hover:-translate-y-1 hover:shadow-lg border border-transparent"
-        :class="{ '!border-neon-magenta bg-[rgba(255,45,149,0.04)]': currentStation?._id === station._id }"
+        :class="{ '!border-neon-magenta bg-[rgba(255,45,149,0.04)]': currentStation?.stationuuid === station.stationuuid }"
         @click="selectStation(station)">
         <div class="station-card-image w-full h-36 mb-3 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
-          <img v-if="station.imageUrl" :src="station.imageUrl" :alt="station.name" class="w-full h-full object-cover" />
+          <img v-if="station.url_favicon" :src="station.url_favicon" :alt="station.name" class="w-full h-full object-cover" />
           <div v-else class="no-image text-4xl">📻</div>
         </div>
         <div class="station-card-content">
           <h3 class="text-lg font-semibold text-gray-800">{{ station.name }}</h3>
           <p class="station-meta flex gap-2 mt-2 flex-wrap">
-            <span class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold">{{ station.genre }}</span>
-            <span class="country-flag text-gray-600 text-sm">{{ station.country }}</span>
+            <span
+              v-for="tag in getStationTags(station)"
+              :key="tag"
+              class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold">
+              {{ tag }}
+            </span>
+            <span v-if="getStationTags(station).length === 0" class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold">Uncategorized</span>
+            <span class="country-flag text-gray-600 text-sm">{{ getCountryLabel(station.iso_3166_1) }}</span>
           </p>
-          <p class="station-language text-sm text-gray-500 mt-2">{{ station.language }} • {{ station.bitrate }}</p>
+          <p class="station-language text-sm text-gray-500 mt-2">
+            {{ station.iso_639 || 'Unknown language' }}
+          </p>
         </div>
       </div>
     </div>
@@ -47,6 +55,8 @@
 </template>
 
 <script>
+import { getCountryName } from '../utils/countryLookup';
+
 export default {
   name: 'StationList',
   props: {
@@ -65,32 +75,46 @@ export default {
   },
   data() {
     return {
-      selectedGenre: '',
+      selectedTag: '',
       selectedCountry: ''
     }
   },
   computed: {
-    genres() {
-      return [...new Set(this.stations.map(s => s.genre))].sort();
+    tags() {
+      const tagSet = new Set();
+      this.stations.forEach(station => {
+        this.getStationTags(station).forEach(tag => tagSet.add(tag));
+      });
+      return [...tagSet].sort((a, b) => a.localeCompare(b));
     },
     countries() {
-      return [...new Set(this.stations.map(s => s.country))].sort();
+      const codes = this.stations.map(station => station.iso_3166_1).filter(Boolean);
+      return [...new Set(codes)].sort((a, b) => a.localeCompare(b));
     },
     filteredStations() {
       let filtered = this.stations;
 
-      if (this.selectedGenre) {
-        filtered = filtered.filter(s => s.genre === this.selectedGenre);
+      if (this.selectedTag) {
+        filtered = filtered.filter(station => this.getStationTags(station).includes(this.selectedTag));
       }
 
       if (this.selectedCountry) {
-        filtered = filtered.filter(s => s.country === this.selectedCountry);
+        filtered = filtered.filter(station => station.iso_3166_1 === this.selectedCountry);
       }
 
       return filtered;
     }
   },
   methods: {
+    getStationTags(station) {
+      if (!station?.tags) {
+        return [];
+      }
+      return station.tags.split(',').map(tag => tag.trim()).filter(Boolean);
+    },
+    getCountryLabel(code) {
+      return getCountryName(code) || code || 'Unknown country';
+    },
     selectStation(station) {
       this.$emit('select-station', station);
     }

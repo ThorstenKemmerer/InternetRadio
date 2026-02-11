@@ -1,37 +1,50 @@
 const mongoose = require('mongoose');
 
 const stationSchema = new mongoose.Schema({
+  stationuuid: {
+    type: String,
+    required: true,
+    unique: true
+  },
   name: {
     type: String,
     required: true
   },
-  streamUrl: {
+  url_stream: {
     type: String,
     required: true
   },
-  country: {
-    type: String,
-    required: true
-  },
-  genre: {
-    type: String,
-    required: true
-  },
-  description: {
+  url_homepage: {
     type: String,
     default: ''
   },
-  imageUrl: {
+  url_favicon: {
     type: String,
     default: ''
   },
-  language: {
+  tags: {
     type: String,
-    default: 'English'
+    default: ''
   },
-  bitrate: {
+  iso_3166_1: {
     type: String,
-    default: '128kbps'
+    default: ''
+  },
+  iso_3166_2: {
+    type: String,
+    default: ''
+  },
+  iso_639: {
+    type: String,
+    default: null
+  },
+  geo_lat: {
+    type: Number,
+    default: null
+  },
+  geo_long: {
+    type: Number,
+    default: null
   }
 }, {
   timestamps: true

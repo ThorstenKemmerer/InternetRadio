@@ -1,16 +1,26 @@
 <template>
   <div class="radio-player neon-card p-4 rounded-lg">
     <div class="player-info" v-if="currentStation">
-      <img v-if="currentStation.imageUrl" :src="currentStation.imageUrl" :alt="currentStation.name" class="w-32 h-32 object-cover rounded-md shadow-md neon-glow" />
+      <img v-if="currentStation.url_favicon" :src="currentStation.url_favicon" :alt="currentStation.name" class="w-32 h-32 object-cover rounded-md shadow-md neon-glow" />
       <div class="station-details ml-4">
         <h2 class="text-2xl font-semibold neon-text">{{ currentStation.name }}</h2>
-        <p class="text-sm uppercase tracking-wide opacity-90 text-neon-magenta">{{ currentStation.genre }} • {{ currentStation.country }}</p>
-        <p class="mt-2 text-sm opacity-80">{{ currentStation.description }}</p>
+        <p class="text-sm uppercase tracking-wide opacity-90 text-neon-magenta">
+          {{ tagLine }} • {{ getCountryLabel(currentStation.iso_3166_1) }}
+        </p>
+        <p v-if="currentStation.url_homepage" class="mt-2 text-sm opacity-90">
+          <a
+            :href="currentStation.url_homepage"
+            class="underline"
+            target="_blank"
+            rel="noopener noreferrer">
+            Visit station homepage
+          </a>
+        </p>
       </div>
     </div>
     
     <div class="player-controls flex items-center gap-4 flex-wrap mt-4">
-      <audio ref="audioPlayer" :src="currentStation?.streamUrl" @error="handleError"></audio>
+      <audio ref="audioPlayer" :src="currentStation?.url_stream" @error="handleError"></audio>
       
       <button @click="togglePlay" class="neon-btn font-bold hover:neon-glow transition transform">
         {{ isPlaying ? '⏸ Pause' : '▶ Play' }}
@@ -37,6 +47,8 @@
 </template>
 
 <script>
+import { getCountryName } from '../utils/countryLookup';
+
 export default {
   name: 'RadioPlayer',
   props: {
@@ -52,6 +64,20 @@ export default {
       error: null
     }
   },
+  computed: {
+    tagLine() {
+      if (!this.currentStation?.tags) {
+        return 'Uncategorized';
+      }
+
+      const tags = this.currentStation.tags
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(Boolean);
+
+      return tags.length > 0 ? tags.join(' / ') : 'Uncategorized';
+    }
+  },
   watch: {
     currentStation(newStation) {
       if (newStation && this.isPlaying) {
@@ -62,6 +88,9 @@ export default {
     }
   },
   methods: {
+    getCountryLabel(code) {
+      return getCountryName(code) || code || 'Unknown country';
+    },
     togglePlay() {
       if (!this.currentStation) {
         this.error = 'Please select a radio station first';

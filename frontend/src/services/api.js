@@ -26,12 +26,12 @@ export const stationService = {
     }
   },
 
-  async getStationsByGenre(genre) {
+  async getStationsByTag(tag) {
     try {
-      const response = await axios.get(`${API_URL}/stations/genre/${genre}`);
+      const response = await axios.get(`${API_URL}/stations/tag/${tag}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching stations by genre:', error);
+      console.error('Error fetching stations by tag:', error);
       throw error;
     }
   },
