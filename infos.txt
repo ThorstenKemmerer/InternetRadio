@@ -28,3 +28,7 @@ If you want, I can add a short README note with recommended VITE_API_URL example
 
 ---
 
+https://www.radio-browser.info/
+https://backups.radio-browser.info/
+
+---
