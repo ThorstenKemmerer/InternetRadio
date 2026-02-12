@@ -38,7 +38,7 @@
           </span>
         </div>
         <div class="text-sm text-gray-600">
-          {{ currentStation?.iso_3166_1 || 'N/A' }}
+          {{ formatIsoCode(currentStation?.iso_3166_1) }}
         </div>
         <div class="text-sm">
           <a
@@ -93,7 +93,6 @@
 </template>
 
 <script>
-import { getCountryName, getSubdivisionName } from '../utils/countryLookup';
 
 export default {
   name: 'RadioPlayer',
@@ -110,17 +109,6 @@ export default {
       error: null
     }
   },
-  computed: {
-    locationLabel() {
-      const station = this.currentStation;
-      if (!station) return 'Unknown location';
-
-      const sub = getSubdivisionName(station.iso_3166_2);
-      if (sub) return sub;
-
-      return this.getCountryLabel(station.iso_3166_1) || 'Unknown country';
-    }
-  },
   watch: {
     currentStation(newStation) {
       if (newStation && this.isPlaying) {
@@ -134,9 +122,6 @@ export default {
     this.updateVolume();
   },
   methods: {
-    getCountryLabel(code) {
-      return getCountryName(code) || code || 'Unknown country';
-    },
     getStationInitial(station) {
       const name = station?.name ? station.name.trim() : '';
       return name ? name[0].toUpperCase() : '?';
@@ -149,6 +134,9 @@ export default {
     },
     getStationTagsLimited(station) {
       return this.getStationTags(station).slice(0, 5);
+    },
+    formatIsoCode(value) {
+      return value ? String(value).toUpperCase() : 'N/A';
     },
     togglePlay() {
       if (!this.currentStation) {
