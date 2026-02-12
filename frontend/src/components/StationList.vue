@@ -3,44 +3,91 @@
     <div class="filters flex gap-4 mb-4 flex-wrap">
       <div class="filter-group flex flex-col gap-2 flex-1 min-w-[200px]">
         <label class="font-semibold text-gray-700">Filter by Tag:</label>
-        <select v-model="selectedTag" class="p-2 border rounded-md">
-          <option value="">All Tags</option>
-          <option v-for="tag in tags" :key="tag" :value="tag">{{ tag }}</option>
+        <select
+          v-model="selectedTag"
+          class="p-2 border rounded-md"
+        >
+          <option value="">
+            All Tags
+          </option>
+          <option
+            v-for="tag in tags"
+            :key="tag"
+            :value="tag"
+          >
+            {{ tag }}
+          </option>
         </select>
       </div>
 
       <div class="filter-group flex flex-col gap-2 flex-1 min-w-[200px]">
         <label class="font-semibold text-gray-700">Filter by Country:</label>
-        <select v-model="selectedCountry" class="p-2 border rounded-md">
-          <option value="">All Countries</option>
-          <option v-for="country in countries" :key="country" :value="country">{{ getCountryLabel(country) }}</option>
+        <select
+          v-model="selectedCountry"
+          class="p-2 border rounded-md"
+        >
+          <option value="">
+            All Countries
+          </option>
+          <option
+            v-for="country in countries"
+            :key="country"
+            :value="country"
+          >
+            {{ getCountryLabel(country) }}
+          </option>
         </select>
       </div>
     </div>
 
-    <div v-if="loading" class="text-center p-10 text-lg text-gray-600">Loading stations...</div>
+    <div
+      v-if="loading"
+      class="text-center p-10 text-lg text-gray-600"
+    >
+      Loading stations...
+    </div>
 
-    <div v-else class="stations-grid grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      v-else
+      class="stations-grid grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+    >
       <div
         v-for="station in filteredStations"
         :key="station.stationuuid"
         class="station-card neon-card p-4 cursor-pointer transition transform hover:-translate-y-1 hover:shadow-lg border border-transparent"
         :class="{ '!border-neon-magenta bg-[rgba(255,45,149,0.04)]': currentStation?.stationuuid === station.stationuuid }"
-        @click="selectStation(station)">
+        @click="selectStation(station)"
+      >
         <div class="station-card-image w-full h-36 mb-3 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
-          <img v-if="station.url_favicon" :src="station.url_favicon" :alt="station.name" class="w-full h-full object-cover" />
-          <div v-else class="no-image text-4xl">📻</div>
+          <img
+            v-if="station.url_favicon"
+            :src="station.url_favicon"
+            :alt="station.name"
+            class="w-full h-full object-cover"
+          >
+          <div
+            v-else
+            class="no-image text-4xl"
+          >
+            📻
+          </div>
         </div>
         <div class="station-card-content">
-          <h3 class="text-lg font-semibold text-gray-800">{{ station.name }}</h3>
+          <h3 class="text-lg font-semibold text-gray-800">
+            {{ station.name }}
+          </h3>
           <p class="station-meta flex gap-2 mt-2 flex-wrap">
             <span
               v-for="tag in getStationTags(station)"
               :key="tag"
-              class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold">
+              class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
+            >
               {{ tag }}
             </span>
-            <span v-if="getStationTags(station).length === 0" class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold">Uncategorized</span>
+            <span
+              v-if="getStationTags(station).length === 0"
+              class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
+            >Uncategorized</span>
             <span class="country-flag text-gray-600 text-sm">{{ getLocationLabel(station) }}</span>
           </p>
           <p class="station-language text-sm text-gray-500 mt-2">
@@ -50,7 +97,12 @@
       </div>
     </div>
 
-    <div v-if="!loading && filteredStations.length === 0" class="text-center p-10 text-gray-500">No stations found for the selected filters.</div>
+    <div
+      v-if="!loading && filteredStations.length === 0"
+      class="text-center p-10 text-gray-500"
+    >
+      No stations found for the selected filters.
+    </div>
   </div>
 </template>
 
@@ -74,6 +126,7 @@ export default {
       default: false
     }
   },
+  emits: ['select-station'],
   data() {
     return {
       selectedTag: '',

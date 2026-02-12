@@ -1,27 +1,40 @@
 <template>
-  <div id="app" class="mx-auto max-w-6xl px-5">
-    <div class="scanline-overlay"></div>
+  <div
+    id="app"
+    class="mx-auto max-w-6xl px-5"
+  >
+    <div class="scanline-overlay" />
     <header class="text-center mb-10 py-8">
-      <img src="/src/assets/neon-logo.svg" alt="Neon Logo" class="mx-auto w-40 mb-4" />
-      <h1 class="text-5xl font-extrabold neon-heading neon-text mb-2">🎵 Internet Radio</h1>
-      <p class="text-neon-cyan opacity-90 text-lg">Listen to radio streams from around the world</p>
+      <img
+        src="/src/assets/neon-logo.svg"
+        alt="Neon Logo"
+        class="mx-auto w-40 mb-4"
+      >
+      <h1 class="text-5xl font-extrabold neon-heading neon-text mb-2">
+        🎵 Internet Radio
+      </h1>
+      <p class="text-neon-cyan opacity-90 text-lg">
+        Listen to radio streams from around the world
+      </p>
     </header>
 
     <main class="mb-10">
       <RadioPlayer 
-        :currentStation="currentStation"
+        :current-station="currentStation"
       />
       
       <StationList 
         :stations="stations"
-        :currentStation="currentStation"
+        :current-station="currentStation"
         :loading="loading"
         @select-station="handleSelectStation"
       />
     </main>
 
     <footer class="text-center py-5 text-gray-500 border-t border-gray-200 mt-10">
-      <p class="text-sm">Internet Radio App • Built with MEVN Stack (MongoDB, Express, Vue, Node.js)</p>
+      <p class="text-sm">
+        Internet Radio App • Built with MEVN Stack (MongoDB, Express, Vue, Node.js)
+      </p>
     </footer>
   </div>
 </template>
@@ -44,6 +57,9 @@ export default {
       loading: true
     }
   },
+  mounted() {
+    this.loadStations();
+  },
   methods: {
     async loadStations() {
       try {
@@ -64,9 +80,6 @@ export default {
     handleSelectStation(station) {
       this.currentStation = station;
     }
-  },
-  mounted() {
-    this.loadStations();
   }
 }
 </script>
