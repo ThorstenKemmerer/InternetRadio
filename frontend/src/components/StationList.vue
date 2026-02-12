@@ -41,65 +41,8 @@
     </div>
 
     <div
-      v-if="loading"
-      class="text-center p-10 text-lg text-gray-600"
-    >
-      Loading stations...
-    </div>
-
-    <div
-      v-else
-      class="stations-grid grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-    >
-      <div
-        v-for="station in stations"
-        :key="station.stationuuid"
-        class="station-card neon-card p-4 cursor-pointer transition transform hover:-translate-y-1 hover:shadow-lg border border-transparent"
-        :class="{ '!border-neon-magenta bg-[rgba(255,45,149,0.04)]': currentStation?.stationuuid === station.stationuuid }"
-        @click="selectStation(station)"
-      >
-        <div class="station-card-image w-full h-36 mb-3 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
-          <img
-            v-if="station.url_favicon"
-            :src="station.url_favicon"
-            :alt="station.name"
-            class="w-full h-full object-cover"
-          >
-          <div
-            v-else
-            class="no-image text-4xl"
-          >
-            📻
-          </div>
-        </div>
-        <div class="station-card-content">
-          <h3 class="text-lg font-semibold text-gray-800">
-            {{ station.name }}
-          </h3>
-          <p class="station-meta flex gap-2 mt-2 flex-wrap">
-            <span
-              v-for="tag in getStationTags(station)"
-              :key="tag"
-              class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
-            >
-              {{ tag }}
-            </span>
-            <span
-              v-if="getStationTags(station).length === 0"
-              class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
-            >Uncategorized</span>
-            <span class="country-flag text-gray-600 text-sm">{{ getLocationLabel(station) }}</span>
-          </p>
-          <p class="station-language text-sm text-gray-500 mt-2">
-            {{ getLanguageLabel(station?.iso_639) || 'Unknown language' }}
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div
       v-if="!loading && pagination"
-      class="flex items-center justify-between mt-6"
+      class="flex items-center justify-between mt-6 mb-6"
     >
       <button
         type="button"
@@ -120,6 +63,76 @@
       >
         Next
       </button>
+    </div>
+
+    <div
+      v-if="loading"
+      class="text-center p-10 text-lg text-gray-600"
+    >
+      Loading stations...
+    </div>
+
+    <div
+      v-else
+      class="stations-grid grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+    >
+      <div
+        v-for="station in stations"
+        :key="station.stationuuid"
+        class="station-card neon-card p-4 cursor-pointer transition transform hover:-translate-y-1 hover:shadow-lg border border-transparent"
+        :class="{ '!border-neon-magenta bg-[rgba(255,45,149,0.04)]': currentStation?.stationuuid === station.stationuuid }"
+        @click="selectStation(station)"
+      >
+        <div class="flex items-start gap-3">
+          <div class="station-card-image w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center shrink-0">
+            <img
+              v-if="station.url_favicon"
+              :src="station.url_favicon"
+              :alt="station.name"
+              class="w-full h-full object-contain"
+            >
+            <div
+              v-else
+              class="no-image text-lg font-semibold text-gray-700"
+            >
+              {{ getStationInitial(station) }}
+            </div>
+          </div>
+          <div class="station-card-content flex flex-col gap-2">
+            <h3 class="text-lg font-semibold text-gray-800">
+              {{ station.name }}
+            </h3>
+            <div class="station-tags flex gap-2 flex-wrap">
+              <span
+                v-for="tag in getStationTagsLimited(station)"
+                :key="tag"
+                class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
+              >
+                {{ tag }}
+              </span>
+              <span
+                v-if="getStationTags(station).length === 0"
+                class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
+              >Uncategorized</span>
+            </div>
+            <div class="country-flag text-gray-600 text-sm">
+              {{ station?.iso_3166_1 || 'N/A' }}
+            </div>
+            <div class="station-homepage text-sm">
+              <a
+                v-if="station.url_homepage"
+                :href="station.url_homepage"
+                class="text-gray-600 underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Homepage
+              </a>
+              <span v-else class="text-gray-500">No homepage</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div
@@ -198,6 +211,13 @@ export default {
         return [];
       }
       return station.tags.split(',').map(tag => tag.trim()).filter(Boolean);
+    },
+    getStationTagsLimited(station) {
+      return this.getStationTags(station).slice(0, 5);
+    },
+    getStationInitial(station) {
+      const name = station?.name ? station.name.trim() : '';
+      return name ? name[0].toUpperCase() : '?';
     },
     getCountryLabel(code) {
       return getCountryName(code) || code || 'Unknown country';

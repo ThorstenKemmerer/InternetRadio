@@ -2,34 +2,56 @@
   <div class="radio-player neon-card p-4 rounded-lg">
     <div
       v-if="currentStation"
-      class="player-info"
+      class="player-info flex items-start gap-3"
     >
-      <img
-        v-if="currentStation.url_favicon"
-        :src="currentStation.url_favicon"
-        :alt="currentStation.name"
-        class="w-32 h-32 object-cover rounded-md shadow-md neon-glow"
-      >
-      <div class="station-details ml-4">
+      <div class="w-32 h-32 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center shrink-0">
+        <img
+          v-if="currentStation.url_favicon"
+          :src="currentStation.url_favicon"
+          :alt="currentStation.name"
+          class="w-full h-full object-contain"
+        >
+        <div
+          v-else
+          class="text-2xl font-semibold text-gray-700"
+        >
+          {{ getStationInitial(currentStation) }}
+        </div>
+      </div>
+      <div class="station-details flex flex-col gap-2">
         <h2 class="text-2xl font-semibold neon-text">
           {{ currentStation.name }}
         </h2>
-        <p class="text-sm uppercase tracking-wide opacity-90 text-neon-magenta">
-          {{ tagLine }} • {{ locationLabel }}
-        </p>
-        <p
-          v-if="currentStation.url_homepage"
-          class="mt-2 text-sm opacity-90"
-        >
+        <div class="station-tags flex gap-2 flex-wrap">
+          <span
+            v-for="tag in getStationTagsLimited(currentStation)"
+            :key="tag"
+            class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
+          >
+            {{ tag }}
+          </span>
+          <span
+            v-if="getStationTags(currentStation).length === 0"
+            class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
+          >
+            Uncategorized
+          </span>
+        </div>
+        <div class="text-sm text-gray-600">
+          {{ currentStation?.iso_3166_1 || 'N/A' }}
+        </div>
+        <div class="text-sm">
           <a
+            v-if="currentStation.url_homepage"
             :href="currentStation.url_homepage"
-            class="underline"
+            class="text-gray-600 underline"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Visit station homepage
+            Homepage
           </a>
-        </p>
+          <span v-else class="text-gray-500">No homepage</span>
+        </div>
       </div>
     </div>
     
@@ -89,19 +111,6 @@ export default {
     }
   },
   computed: {
-    tagLine() {
-      if (!this.currentStation?.tags) {
-        return 'Uncategorized';
-      }
-
-      const tags = this.currentStation.tags
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(Boolean);
-
-      return tags.length > 0 ? tags.join(' / ') : 'Uncategorized';
-    }
-    ,
     locationLabel() {
       const station = this.currentStation;
       if (!station) return 'Unknown location';
@@ -127,6 +136,19 @@ export default {
   methods: {
     getCountryLabel(code) {
       return getCountryName(code) || code || 'Unknown country';
+    },
+    getStationInitial(station) {
+      const name = station?.name ? station.name.trim() : '';
+      return name ? name[0].toUpperCase() : '?';
+    },
+    getStationTags(station) {
+      if (!station?.tags) {
+        return [];
+      }
+      return station.tags.split(',').map(tag => tag.trim()).filter(Boolean);
+    },
+    getStationTagsLimited(station) {
+      return this.getStationTags(station).slice(0, 5);
     },
     togglePlay() {
       if (!this.currentStation) {
