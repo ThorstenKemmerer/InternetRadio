@@ -44,7 +44,7 @@
             <span class="country-flag text-gray-600 text-sm">{{ getLocationLabel(station) }}</span>
           </p>
           <p class="station-language text-sm text-gray-500 mt-2">
-            {{ station.iso_639 || 'Unknown language' }}
+            {{ getLanguageLabel(station?.iso_639) || 'Unknown language' }}
           </p>
         </div>
       </div>
@@ -56,6 +56,7 @@
 
 <script>
 import { getCountryName, getSubdivisionName } from '../utils/countryLookup';
+import { getLanguageLabel } from '../utils/languageLookup';
 
 export default {
   name: 'StationList',
@@ -120,6 +121,9 @@ export default {
       if (sub) return sub;
 
       return this.getCountryLabel(station?.iso_3166_1);
+    },
+    getLanguageLabel(code) {
+      return getLanguageLabel(code);
     },
     selectStation(station) {
       this.$emit('select-station', station);
