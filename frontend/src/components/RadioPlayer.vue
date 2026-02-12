@@ -134,7 +134,7 @@ export default {
       const audio = this.$refs.audioPlayer;
       audio.volume = this.volume / 100;
     },
-    handleError(e) {
+    handleError() {
       this.error = 'Stream error. This station may be unavailable.';
       this.isPlaying = false;
     }
