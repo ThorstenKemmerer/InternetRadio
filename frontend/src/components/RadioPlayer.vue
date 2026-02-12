@@ -5,7 +5,7 @@
       <div class="station-details ml-4">
         <h2 class="text-2xl font-semibold neon-text">{{ currentStation.name }}</h2>
         <p class="text-sm uppercase tracking-wide opacity-90 text-neon-magenta">
-          {{ tagLine }} • {{ getCountryLabel(currentStation.iso_3166_1) }}
+          {{ tagLine }} • {{ locationLabel }}
         </p>
         <p v-if="currentStation.url_homepage" class="mt-2 text-sm opacity-90">
           <a
@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { getCountryName } from '../utils/countryLookup';
+import { getCountryName, getSubdivisionName } from '../utils/countryLookup';
 
 export default {
   name: 'RadioPlayer',
@@ -76,6 +76,16 @@ export default {
         .filter(Boolean);
 
       return tags.length > 0 ? tags.join(' / ') : 'Uncategorized';
+    }
+    ,
+    locationLabel() {
+      const station = this.currentStation;
+      if (!station) return 'Unknown location';
+
+      const sub = getSubdivisionName(station.iso_3166_2);
+      if (sub) return sub;
+
+      return this.getCountryLabel(station.iso_3166_1) || 'Unknown country';
     }
   },
   watch: {

@@ -41,7 +41,7 @@
               {{ tag }}
             </span>
             <span v-if="getStationTags(station).length === 0" class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold">Uncategorized</span>
-            <span class="country-flag text-gray-600 text-sm">{{ getCountryLabel(station.iso_3166_1) }}</span>
+            <span class="country-flag text-gray-600 text-sm">{{ getLocationLabel(station) }}</span>
           </p>
           <p class="station-language text-sm text-gray-500 mt-2">
             {{ station.iso_639 || 'Unknown language' }}
@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { getCountryName } from '../utils/countryLookup';
+import { getCountryName, getSubdivisionName } from '../utils/countryLookup';
 
 export default {
   name: 'StationList',
@@ -114,6 +114,12 @@ export default {
     },
     getCountryLabel(code) {
       return getCountryName(code) || code || 'Unknown country';
+    },
+    getLocationLabel(station) {
+      const sub = getSubdivisionName(station?.iso_3166_2);
+      if (sub) return sub;
+
+      return this.getCountryLabel(station?.iso_3166_1);
     },
     selectStation(station) {
       this.$emit('select-station', station);
