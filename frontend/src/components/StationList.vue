@@ -41,6 +41,31 @@
     </div>
 
     <div
+      v-if="!loading && pagination"
+      class="flex items-center justify-between mt-6 mb-6"
+    >
+      <button
+        type="button"
+        class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        :disabled="!canGoPrev"
+        @click="changePage(pagination.page - 1)"
+      >
+        Prev
+      </button>
+      <div class="text-sm text-gray-600">
+        Page {{ pagination.totalPages === 0 ? 0 : pagination.page }} of {{ pagination.totalPages }}
+      </div>
+      <button
+        type="button"
+        class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        :disabled="!canGoNext"
+        @click="changePage(pagination.page + 1)"
+      >
+        Next
+      </button>
+    </div>
+
+    <div
       v-if="loading"
       class="text-center p-10 text-lg text-gray-600"
     >
@@ -68,18 +93,18 @@
             >
             <div
               v-else
-              class="no-image text-xl"
+              class="no-image text-lg font-semibold text-gray-700"
             >
-              📻
+              {{ getStationInitial(station) }}
             </div>
           </div>
-          <div class="station-card-content">
+          <div class="station-card-content flex flex-col gap-2">
             <h3 class="text-lg font-semibold text-gray-800">
               {{ station.name }}
             </h3>
-            <p class="station-meta flex gap-2 mt-2 flex-wrap">
+            <div class="station-tags flex gap-2 flex-wrap">
               <span
-                v-for="tag in getStationTags(station)"
+                v-for="tag in getStationTagsLimited(station)"
                 :key="tag"
                 class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
               >
@@ -89,39 +114,25 @@
                 v-if="getStationTags(station).length === 0"
                 class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
               >Uncategorized</span>
-              <span class="country-flag text-gray-600 text-sm">{{ getLocationLabel(station) }}</span>
-            </p>
-            <p class="station-language text-sm text-gray-500 mt-2">
-              {{ getLanguageLabel(station?.iso_639) || 'Unknown language' }}
-            </p>
+            </div>
+            <div class="country-flag text-gray-600 text-sm">
+              {{ station?.iso_3166_1 || 'N/A' }}
+            </div>
+            <div class="station-homepage text-sm">
+              <a
+                v-if="station.url_homepage"
+                :href="station.url_homepage"
+                class="text-gray-600 underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Homepage
+              </a>
+              <span v-else class="text-gray-500">No homepage</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <div
-      v-if="!loading && pagination"
-      class="flex items-center justify-between mt-6"
-    >
-      <button
-        type="button"
-        class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        :disabled="!canGoPrev"
-        @click="changePage(pagination.page - 1)"
-      >
-        Prev
-      </button>
-      <div class="text-sm text-gray-600">
-        Page {{ pagination.totalPages === 0 ? 0 : pagination.page }} of {{ pagination.totalPages }}
-      </div>
-      <button
-        type="button"
-        class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        :disabled="!canGoNext"
-        @click="changePage(pagination.page + 1)"
-      >
-        Next
-      </button>
     </div>
 
     <div
@@ -200,6 +211,13 @@ export default {
         return [];
       }
       return station.tags.split(',').map(tag => tag.trim()).filter(Boolean);
+    },
+    getStationTagsLimited(station) {
+      return this.getStationTags(station).slice(0, 5);
+    },
+    getStationInitial(station) {
+      const name = station?.name ? station.name.trim() : '';
+      return name ? name[0].toUpperCase() : '?';
     },
     getCountryLabel(code) {
       return getCountryName(code) || code || 'Unknown country';

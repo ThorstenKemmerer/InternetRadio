@@ -5,12 +5,7 @@
   >
     <div class="scanline-overlay" />
     <header class="text-center mb-10 py-8">
-      <img
-        src="/src/assets/neon-logo.svg"
-        alt="Neon Logo"
-        class="mx-auto w-40 mb-4"
-      >
-      <h1 class="text-5xl font-extrabold neon-heading neon-text mb-2">
+      <h1 class="text-5xl font-extrabold neon-heading mb-2 bg-[linear-gradient(90deg,var(--neon-magenta),var(--neon-cyan))] text-transparent bg-clip-text">
         🎵 Internet Radio
       </h1>
       <p class="text-neon-cyan opacity-90 text-lg">
