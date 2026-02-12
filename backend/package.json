@@ -7,9 +7,15 @@
     "start": "node server.js",
     "start:standalone": "node server-standalone.js",
     "dev": "nodemon server.js",
-    "seed": "node seed.js"
+    "seed": "node seed.js",
+    "test": "vitest --run",
+    "lint": "eslint . --ext .js"
   },
-  "keywords": ["radio", "streaming", "api"],
+  "keywords": [
+    "radio",
+    "streaming",
+    "api"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
@@ -19,6 +25,9 @@
     "dotenv": "^16.0.3"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "vitest": "^1.0.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.50.0"
   }
 }
