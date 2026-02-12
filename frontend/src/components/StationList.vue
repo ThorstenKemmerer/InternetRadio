@@ -58,41 +58,43 @@
         :class="{ '!border-neon-magenta bg-[rgba(255,45,149,0.04)]': currentStation?.stationuuid === station.stationuuid }"
         @click="selectStation(station)"
       >
-        <div class="station-card-image w-full h-36 mb-3 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
-          <img
-            v-if="station.url_favicon"
-            :src="station.url_favicon"
-            :alt="station.name"
-            class="w-full h-full object-cover"
-          >
-          <div
-            v-else
-            class="no-image text-4xl"
-          >
-            📻
-          </div>
-        </div>
-        <div class="station-card-content">
-          <h3 class="text-lg font-semibold text-gray-800">
-            {{ station.name }}
-          </h3>
-          <p class="station-meta flex gap-2 mt-2 flex-wrap">
-            <span
-              v-for="tag in getStationTags(station)"
-              :key="tag"
-              class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
+        <div class="flex items-start gap-3">
+          <div class="station-card-image w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center shrink-0">
+            <img
+              v-if="station.url_favicon"
+              :src="station.url_favicon"
+              :alt="station.name"
+              class="w-full h-full object-contain"
             >
-              {{ tag }}
-            </span>
-            <span
-              v-if="getStationTags(station).length === 0"
-              class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
-            >Uncategorized</span>
-            <span class="country-flag text-gray-600 text-sm">{{ getLocationLabel(station) }}</span>
-          </p>
-          <p class="station-language text-sm text-gray-500 mt-2">
-            {{ getLanguageLabel(station?.iso_639) || 'Unknown language' }}
-          </p>
+            <div
+              v-else
+              class="no-image text-xl"
+            >
+              📻
+            </div>
+          </div>
+          <div class="station-card-content">
+            <h3 class="text-lg font-semibold text-gray-800">
+              {{ station.name }}
+            </h3>
+            <p class="station-meta flex gap-2 mt-2 flex-wrap">
+              <span
+                v-for="tag in getStationTags(station)"
+                :key="tag"
+                class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
+              >
+                {{ tag }}
+              </span>
+              <span
+                v-if="getStationTags(station).length === 0"
+                class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
+              >Uncategorized</span>
+              <span class="country-flag text-gray-600 text-sm">{{ getLocationLabel(station) }}</span>
+            </p>
+            <p class="station-language text-sm text-gray-500 mt-2">
+              {{ getLanguageLabel(station?.iso_639) || 'Unknown language' }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
