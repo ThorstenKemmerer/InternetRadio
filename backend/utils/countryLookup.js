@@ -18,7 +18,7 @@ const formatSubdivision = (code) => {
     }
 
     const countryName = displayNames ? displayNames.of(countryCode) : countryCode;
-    return `${countryName || countryCode} - ${subdivisionCode}`;
+    return `${countryName || countryCode} / ${subdivisionCode}`;
 };
 
 const getCountryName = (code) => {
