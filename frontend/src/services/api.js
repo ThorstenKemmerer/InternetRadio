@@ -6,32 +6,37 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api' : 'http://localhost:3000/api');
 
 export const stationService = {
-  async getAllStations() {
+  async getStations({ page = 1, limit = 50, tag = '', country = '' } = {}) {
     try {
-      const response = await axios.get(`${API_URL}/stations`);
+      const response = await axios.get(`${API_URL}/stations`, {
+        params: {
+          page,
+          limit,
+          tag: tag || undefined,
+          country: country || undefined
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching stations:', error);
       throw error;
     }
   },
-
-  async getStationsByCountry(country) {
+  async getCountries() {
     try {
-      const response = await axios.get(`${API_URL}/stations/country/${country}`);
+      const response = await axios.get(`${API_URL}/stations/countries`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching stations by country:', error);
+      console.error('Error fetching countries:', error);
       throw error;
     }
   },
-
-  async getStationsByTag(tag) {
+  async getTags() {
     try {
-      const response = await axios.get(`${API_URL}/stations/tag/${tag}`);
+      const response = await axios.get(`${API_URL}/stations/tags`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching stations by tag:', error);
+      console.error('Error fetching tags:', error);
       throw error;
     }
   },

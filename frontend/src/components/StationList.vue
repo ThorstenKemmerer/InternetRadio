@@ -52,7 +52,7 @@
       class="stations-grid grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
     >
       <div
-        v-for="station in filteredStations"
+        v-for="station in stations"
         :key="station.stationuuid"
         class="station-card neon-card p-4 cursor-pointer transition transform hover:-translate-y-1 hover:shadow-lg border border-transparent"
         :class="{ '!border-neon-magenta bg-[rgba(255,45,149,0.04)]': currentStation?.stationuuid === station.stationuuid }"
@@ -98,7 +98,32 @@
     </div>
 
     <div
-      v-if="!loading && filteredStations.length === 0"
+      v-if="!loading && pagination"
+      class="flex items-center justify-between mt-6"
+    >
+      <button
+        type="button"
+        class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        :disabled="!canGoPrev"
+        @click="changePage(pagination.page - 1)"
+      >
+        Prev
+      </button>
+      <div class="text-sm text-gray-600">
+        Page {{ pagination.totalPages === 0 ? 0 : pagination.page }} of {{ pagination.totalPages }}
+      </div>
+      <button
+        type="button"
+        class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        :disabled="!canGoNext"
+        @click="changePage(pagination.page + 1)"
+      >
+        Next
+      </button>
+    </div>
+
+    <div
+      v-if="!loading && stations.length === 0"
       class="text-center p-10 text-gray-500"
     >
       No stations found for the selected filters.
@@ -117,6 +142,18 @@ export default {
       type: Array,
       required: true
     },
+    tags: {
+      type: Array,
+      default: () => []
+    },
+    countries: {
+      type: Array,
+      default: () => []
+    },
+    pagination: {
+      type: Object,
+      default: null
+    },
     currentStation: {
       type: Object,
       default: null
@@ -126,7 +163,7 @@ export default {
       default: false
     }
   },
-  emits: ['select-station'],
+  emits: ['select-station', 'filters-changed', 'page-changed'],
   data() {
     return {
       selectedTag: '',
@@ -134,32 +171,28 @@ export default {
     }
   },
   computed: {
-    tags() {
-      const tagSet = new Set();
-      this.stations.forEach(station => {
-        this.getStationTags(station).forEach(tag => tagSet.add(tag));
-      });
-      return [...tagSet].sort((a, b) => a.localeCompare(b));
+    canGoPrev() {
+      return this.pagination?.page > 1;
     },
-    countries() {
-      const codes = this.stations.map(station => station.iso_3166_1).filter(Boolean);
-      return [...new Set(codes)].sort((a, b) => a.localeCompare(b));
+    canGoNext() {
+      return this.pagination && this.pagination.page < this.pagination.totalPages;
+    }
+  },
+  watch: {
+    selectedTag() {
+      this.emitFilters();
     },
-    filteredStations() {
-      let filtered = this.stations;
-
-      if (this.selectedTag) {
-        filtered = filtered.filter(station => this.getStationTags(station).includes(this.selectedTag));
-      }
-
-      if (this.selectedCountry) {
-        filtered = filtered.filter(station => station.iso_3166_1 === this.selectedCountry);
-      }
-
-      return filtered;
+    selectedCountry() {
+      this.emitFilters();
     }
   },
   methods: {
+    emitFilters() {
+      this.$emit('filters-changed', {
+        tag: this.selectedTag,
+        country: this.selectedCountry
+      });
+    },
     getStationTags(station) {
       if (!station?.tags) {
         return [];
@@ -180,6 +213,12 @@ export default {
     },
     selectStation(station) {
       this.$emit('select-station', station);
+    },
+    changePage(page) {
+      if (!this.pagination || page < 1 || page > this.pagination.totalPages) {
+        return;
+      }
+      this.$emit('page-changed', page);
     }
   }
 }

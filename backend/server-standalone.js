@@ -667,11 +667,50 @@ const stations = [
 
 const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const getStationTags = tags => (tags ? tags.split(',').map(tag => tag.trim()).filter(Boolean) : []);
+const parsePositiveInt = (value, fallback) => {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isNaN(parsed) || parsed < 1 ? fallback : parsed;
+};
+const getPagination = query => {
+  const limit = Math.min(parsePositiveInt(query.limit, 50), 50);
+  const page = parsePositiveInt(query.page, 1);
+  return { page, limit };
+};
+const getStationsResponse = (items, query) => {
+  const { page, limit } = getPagination(query);
+  const total = items.length;
+  const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+  const safePage = totalPages > 0 && page > totalPages ? totalPages : page;
+  const startIndex = (safePage - 1) * limit;
+  const stations = items.slice(startIndex, startIndex + limit);
+
+  return {
+    stations,
+    pagination: {
+      page: safePage,
+      limit,
+      total,
+      totalPages
+    }
+  };
+};
 
 // API Routes
 // Get all stations
 app.get('/api/stations', (req, res) => {
-  res.json(stations.sort((a, b) => a.name.localeCompare(b.name)));
+  let filtered = stations;
+  if (req.query.country) {
+    filtered = filtered.filter(station => station.iso_3166_1 === req.query.country);
+  }
+  if (req.query.tag) {
+    const tag = String(req.query.tag).trim();
+    if (tag) {
+      const regex = new RegExp(`(^|,\\s*)${escapeRegExp(tag)}(,|$)`, 'i');
+      filtered = filtered.filter(station => regex.test(station.tags || ''));
+    }
+  }
+  const sorted = filtered.slice().sort((a, b) => a.name.localeCompare(b.name));
+  res.json(getStationsResponse(sorted, req.query));
 });
 
 // Get list of countries (ISO code + display name)
@@ -693,7 +732,8 @@ app.get('/api/stations/tags', (req, res) => {
 // Get stations by country (ISO 3166-1 code)
 app.get('/api/stations/country/:country', (req, res) => {
   const filtered = stations.filter(station => station.iso_3166_1 === req.params.country);
-  res.json(filtered);
+  const sorted = filtered.slice().sort((a, b) => a.name.localeCompare(b.name));
+  res.json(getStationsResponse(sorted, req.query));
 });
 
 // Get stations by tag
@@ -701,7 +741,8 @@ app.get('/api/stations/tag/:tag', (req, res) => {
   const tag = req.params.tag.trim();
   const regex = new RegExp(`(^|,\\s*)${escapeRegExp(tag)}(,|$)`, 'i');
   const filtered = stations.filter(station => regex.test(station.tags || ''));
-  res.json(filtered);
+  const sorted = filtered.slice().sort((a, b) => a.name.localeCompare(b.name));
+  res.json(getStationsResponse(sorted, req.query));
 });
 
 // Get single station
