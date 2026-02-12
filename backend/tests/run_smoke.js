@@ -12,9 +12,9 @@ async function run() {
         const res = await fetch(`${base}/api/stations`);
         if (res.status !== 200) throw new Error(`/api/stations returned ${res.status}`);
         const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) throw new Error('stations response invalid');
+        if (!Array.isArray(data.stations) || data.stations.length === 0) throw new Error('stations response invalid');
 
-        const firstId = data[0].stationuuid;
+        const firstId = data.stations[0].stationuuid;
         const one = await fetch(`${base}/api/stations/${firstId}`);
         if (one.status !== 200) throw new Error(`/api/stations/:id returned ${one.status}`);
 

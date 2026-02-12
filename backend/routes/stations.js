@@ -5,12 +5,49 @@ const { getCountryName } = require('../utils/countryLookup');
 
 const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const getStationTags = tags => (tags ? tags.split(',').map(tag => tag.trim()).filter(Boolean) : []);
+const parsePositiveInt = (value, fallback) => {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isNaN(parsed) || parsed < 1 ? fallback : parsed;
+};
+const getPagination = query => {
+  const limit = Math.min(parsePositiveInt(query.limit, 50), 50);
+  const page = parsePositiveInt(query.page, 1);
+  return { page, limit };
+};
+const getStationsResponse = async (filter, query, sort = { name: 1 }) => {
+  const { page, limit } = getPagination(query);
+  const total = await Station.countDocuments(filter);
+  const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+  const safePage = totalPages > 0 && page > totalPages ? totalPages : page;
+  const skip = (safePage - 1) * limit;
+  const stations = await Station.find(filter).sort(sort).skip(skip).limit(limit);
+
+  return {
+    stations,
+    pagination: {
+      page: safePage,
+      limit,
+      total,
+      totalPages
+    }
+  };
+};
 
 // Get all stations
 router.get('/', async (req, res) => {
   try {
-    const stations = await Station.find().sort({ name: 1 });
-    res.json(stations);
+    const filter = {};
+    if (req.query.country) {
+      filter.iso_3166_1 = req.query.country;
+    }
+    if (req.query.tag) {
+      const tag = String(req.query.tag).trim();
+      if (tag) {
+        filter.tags = new RegExp(`(^|,\\s*)${escapeRegExp(tag)}(,|$)`, 'i');
+      }
+    }
+    const payload = await getStationsResponse(filter, req.query);
+    res.json(payload);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -44,8 +81,9 @@ router.get('/tags', async (req, res) => {
 // Get stations by country (ISO 3166-1 code)
 router.get('/country/:country', async (req, res) => {
   try {
-    const stations = await Station.find({ iso_3166_1: req.params.country });
-    res.json(stations);
+    const filter = { iso_3166_1: req.params.country };
+    const payload = await getStationsResponse(filter, req.query);
+    res.json(payload);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -56,8 +94,8 @@ router.get('/tag/:tag', async (req, res) => {
   try {
     const tag = req.params.tag.trim();
     const regex = new RegExp(`(^|,\\s*)${escapeRegExp(tag)}(,|$)`, 'i');
-    const stations = await Station.find({ tags: regex });
-    res.json(stations);
+    const payload = await getStationsResponse({ tags: regex }, req.query);
+    res.json(payload);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -2,16 +2,17 @@ const request = require('supertest');
 const app = require('../server-standalone');
 
 describe('Backend API (standalone)', () => {
-    it('GET /api/stations returns an array of stations', async () => {
+    it('GET /api/stations returns stations with pagination', async () => {
         const res = await request(app).get('/api/stations');
         expect(res.status).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
-        expect(res.body.length).toBeGreaterThan(0);
+        expect(Array.isArray(res.body.stations)).toBe(true);
+        expect(res.body.stations.length).toBeGreaterThan(0);
+        expect(res.body).toHaveProperty('pagination');
     });
 
     it('GET /api/stations/:id returns station or 404', async () => {
         const all = await request(app).get('/api/stations');
-        const first = all.body[0];
+        const first = all.body.stations[0];
         const res = await request(app).get(`/api/stations/${first.stationuuid}`);
         expect(res.status).toBe(200);
         expect(res.body).toHaveProperty('stationuuid', first.stationuuid);

@@ -25,9 +25,14 @@
       
       <StationList 
         :stations="stations"
+        :tags="tags"
+        :countries="countries"
+        :pagination="pagination"
         :current-station="currentStation"
         :loading="loading"
         @select-station="handleSelectStation"
+        @filters-changed="handleFiltersChanged"
+        @page-changed="handlePageChanged"
       />
     </main>
 
@@ -53,21 +58,52 @@ export default {
   data() {
     return {
       stations: [],
+      tags: [],
+      countries: [],
+      pagination: {
+        page: 1,
+        limit: 50,
+        total: 0,
+        totalPages: 0
+      },
+      selectedTag: '',
+      selectedCountry: '',
       currentStation: null,
       loading: true
     }
   },
   mounted() {
-    this.loadStations();
+    this.loadFilters();
+    this.loadStations({ resetSelection: true });
   },
   methods: {
-    async loadStations() {
+    async loadFilters() {
+      try {
+        const [countries, tags] = await Promise.all([
+          stationService.getCountries(),
+          stationService.getTags()
+        ]);
+        this.countries = countries.map(country => country.code);
+        this.tags = tags;
+      } catch (error) {
+        console.error('Failed to load filters:', error);
+      }
+    },
+    async loadStations({ resetSelection = false } = {}) {
       try {
         this.loading = true;
-        this.stations = await stationService.getAllStations();
+        const response = await stationService.getStations({
+          page: this.pagination.page,
+          limit: this.pagination.limit,
+          tag: this.selectedTag,
+          country: this.selectedCountry
+        });
+        this.stations = response.stations;
+        this.pagination = response.pagination;
         
-        // Auto-select first station if available
-        if (this.stations.length > 0 && !this.currentStation) {
+        if (resetSelection) {
+          this.currentStation = this.stations[0] || null;
+        } else if (!this.currentStation && this.stations.length > 0) {
           this.currentStation = this.stations[0];
         }
       } catch (error) {
@@ -76,6 +112,16 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    handleFiltersChanged({ tag, country }) {
+      this.selectedTag = tag;
+      this.selectedCountry = country;
+      this.pagination.page = 1;
+      this.loadStations({ resetSelection: true });
+    },
+    handlePageChanged(page) {
+      this.pagination.page = page;
+      this.loadStations();
     },
     handleSelectStation(station) {
       this.currentStation = station;
