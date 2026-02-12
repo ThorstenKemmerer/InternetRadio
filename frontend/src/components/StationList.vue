@@ -34,7 +34,7 @@
             :key="country"
             :value="country"
           >
-            {{ getCountryLabel(country) }}
+            {{ formatIsoCode(country) }}
           </option>
         </select>
       </div>
@@ -116,7 +116,7 @@
               >Uncategorized</span>
             </div>
             <div class="country-flag text-gray-600 text-sm">
-              {{ station?.iso_3166_1 || 'N/A' }}
+              {{ formatIsoCode(station?.iso_3166_1) }}
             </div>
             <div class="station-homepage text-sm">
               <a
@@ -145,8 +145,6 @@
 </template>
 
 <script>
-import { getCountryName, getSubdivisionName } from '../utils/countryLookup';
-import { getLanguageLabel } from '../utils/languageLookup';
 
 export default {
   name: 'StationList',
@@ -215,21 +213,12 @@ export default {
     getStationTagsLimited(station) {
       return this.getStationTags(station).slice(0, 5);
     },
+    formatIsoCode(value) {
+      return value ? String(value).toUpperCase() : 'N/A';
+    },
     getStationInitial(station) {
       const name = station?.name ? station.name.trim() : '';
       return name ? name[0].toUpperCase() : '?';
-    },
-    getCountryLabel(code) {
-      return getCountryName(code) || code || 'Unknown country';
-    },
-    getLocationLabel(station) {
-      const sub = getSubdivisionName(station?.iso_3166_2);
-      if (sub) return sub;
-
-      return this.getCountryLabel(station?.iso_3166_1);
-    },
-    getLanguageLabel(code) {
-      return getLanguageLabel(code);
     },
     selectStation(station) {
       this.$emit('select-station', station);
