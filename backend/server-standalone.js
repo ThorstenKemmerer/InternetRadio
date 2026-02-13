@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const { getCountryName } = require('./utils/countryLookup');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -713,11 +712,11 @@ app.get('/api/stations', (req, res) => {
   res.json(getStationsResponse(sorted, req.query));
 });
 
-// Get list of countries (ISO code + display name)
+// Get list of countries (ISO code + raw value)
 app.get('/api/stations/countries', (req, res) => {
   const codes = [...new Set(stations.map(station => station.iso_3166_1).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b));
-  res.json(codes.map(code => ({ code, name: getCountryName(code) })));
+  res.json(codes.map(code => ({ code, name: String(code).trim() })));
 });
 
 // Get list of tags
