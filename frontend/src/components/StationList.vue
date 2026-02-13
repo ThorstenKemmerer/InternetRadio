@@ -2,41 +2,60 @@
   <div class="station-list">
     <div class="filters flex gap-4 mb-4 flex-wrap">
       <div class="filter-group flex flex-col gap-2 flex-1 min-w-[200px]">
-        <label class="font-semibold text-gray-700">Filter by Tag:</label>
-        <select
-          v-model="selectedTag"
-          class="p-2 border rounded-md"
+        <label class="font-semibold text-gray-700">Station name</label>
+        <input
+          v-model="draftFilters.name"
+          type="text"
+          class="p-2 border rounded-md text-gray-900"
+          placeholder="e.g., Jazz FM"
         >
-          <option value="">
-            All Tags
-          </option>
-          <option
-            v-for="tag in tags"
-            :key="tag"
-            :value="tag"
-          >
-            {{ tag }}
-          </option>
-        </select>
       </div>
 
       <div class="filter-group flex flex-col gap-2 flex-1 min-w-[200px]">
-        <label class="font-semibold text-gray-700">Filter by Country:</label>
-        <select
-          v-model="selectedCountry"
-          class="p-2 border rounded-md"
+        <label class="font-semibold text-gray-700">Tags</label>
+        <input
+          v-model="draftFilters.tag"
+          type="text"
+          class="p-2 border rounded-md text-gray-900"
+          placeholder="e.g., jazz"
         >
-          <option value="">
-            All Countries
-          </option>
-          <option
-            v-for="country in countries"
-            :key="country"
-            :value="country"
-          >
-            {{ formatIsoCode(country) }}
-          </option>
-        </select>
+      </div>
+
+      <div class="filter-group flex flex-col gap-2 flex-1 min-w-[200px]">
+        <label class="font-semibold text-gray-700">Country code (ISO 3166-1)</label>
+        <input
+          v-model="draftFilters.country"
+          type="text"
+          class="p-2 border rounded-md text-gray-900"
+          placeholder="e.g., US"
+        >
+      </div>
+
+      <div class="filter-group flex flex-col gap-2 flex-1 min-w-[200px]">
+        <label class="font-semibold text-gray-700">Language code (ISO 639)</label>
+        <input
+          v-model="draftFilters.language"
+          type="text"
+          class="p-2 border rounded-md text-gray-900"
+          placeholder="e.g., en"
+        >
+      </div>
+
+      <div class="filter-group flex items-end gap-2">
+        <button
+          type="button"
+          class="px-4 py-2 rounded-md border border-gray-300 text-gray-700"
+          @click="applyFilters"
+        >
+          Apply
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 rounded-md border border-gray-300 text-gray-700"
+          @click="clearFilters"
+        >
+          Clear
+        </button>
       </div>
     </div>
 
@@ -128,7 +147,10 @@
               >
                 Homepage
               </a>
-              <span v-else class="text-gray-500">No homepage</span>
+              <span
+                v-else
+                class="text-gray-500"
+              >No homepage</span>
             </div>
           </div>
         </div>
@@ -153,14 +175,6 @@ export default {
       type: Array,
       required: true
     },
-    tags: {
-      type: Array,
-      default: () => []
-    },
-    countries: {
-      type: Array,
-      default: () => []
-    },
     pagination: {
       type: Object,
       default: null
@@ -177,8 +191,12 @@ export default {
   emits: ['select-station', 'filters-changed', 'page-changed'],
   data() {
     return {
-      selectedTag: '',
-      selectedCountry: ''
+      draftFilters: {
+        name: '',
+        tag: '',
+        country: '',
+        language: ''
+      }
     }
   },
   computed: {
@@ -189,20 +207,30 @@ export default {
       return this.pagination && this.pagination.page < this.pagination.totalPages;
     }
   },
-  watch: {
-    selectedTag() {
-      this.emitFilters();
-    },
-    selectedCountry() {
-      this.emitFilters();
-    }
-  },
   methods: {
-    emitFilters() {
-      this.$emit('filters-changed', {
-        tag: this.selectedTag,
-        country: this.selectedCountry
-      });
+    applyFilters() {
+      this.$emit('filters-changed', this.normalizeFilters(this.draftFilters));
+    },
+    clearFilters() {
+      this.draftFilters = {
+        name: '',
+        tag: '',
+        country: '',
+        language: ''
+      };
+      this.$emit('filters-changed', this.normalizeFilters(this.draftFilters));
+    },
+    normalizeFilters(filters) {
+      const name = filters.name.trim();
+      const tag = filters.tag.trim();
+      const country = filters.country.trim().toUpperCase();
+      const language = filters.language.trim().toLowerCase();
+      return {
+        name,
+        tag,
+        country,
+        language
+      };
     },
     getStationTags(station) {
       if (!station?.tags) {
@@ -212,9 +240,6 @@ export default {
     },
     getStationTagsLimited(station) {
       return this.getStationTags(station).slice(0, 5);
-    },
-    formatIsoCode(value) {
-      return value ? String(value).toUpperCase() : 'N/A';
     },
     getStationInitial(station) {
       const name = station?.name ? station.name.trim() : '';

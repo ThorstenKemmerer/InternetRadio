@@ -20,8 +20,6 @@
       
       <StationList 
         :stations="stations"
-        :tags="tags"
-        :countries="countries"
         :pagination="pagination"
         :current-station="currentStation"
         :loading="loading"
@@ -53,45 +51,36 @@ export default {
   data() {
     return {
       stations: [],
-      tags: [],
-      countries: [],
       pagination: {
         page: 1,
         limit: 50,
         total: 0,
         totalPages: 0
       },
-      selectedTag: '',
-      selectedCountry: '',
+      selectedFilters: {
+        name: '',
+        tag: '',
+        country: '',
+        language: ''
+      },
       currentStation: null,
       loading: true
     }
   },
   mounted() {
-    this.loadFilters();
     this.loadStations({ resetSelection: true });
   },
   methods: {
-    async loadFilters() {
-      try {
-        const [countries, tags] = await Promise.all([
-          stationService.getCountries(),
-          stationService.getTags()
-        ]);
-        this.countries = countries.map(country => country.code);
-        this.tags = tags;
-      } catch (error) {
-        console.error('Failed to load filters:', error);
-      }
-    },
     async loadStations({ resetSelection = false } = {}) {
       try {
         this.loading = true;
         const response = await stationService.getStations({
           page: this.pagination.page,
           limit: this.pagination.limit,
-          tag: this.selectedTag,
-          country: this.selectedCountry
+          name: this.selectedFilters.name,
+          tag: this.selectedFilters.tag,
+          country: this.selectedFilters.country,
+          language: this.selectedFilters.language
         });
         this.stations = response.stations;
         this.pagination = response.pagination;
@@ -108,9 +97,13 @@ export default {
         this.loading = false;
       }
     },
-    handleFiltersChanged({ tag, country }) {
-      this.selectedTag = tag;
-      this.selectedCountry = country;
+    handleFiltersChanged({ name, tag, country, language }) {
+      this.selectedFilters = {
+        name,
+        tag,
+        country,
+        language
+      };
       this.pagination.page = 1;
       this.loadStations({ resetSelection: true });
     },

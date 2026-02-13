@@ -37,12 +37,27 @@ router.get('/', async (req, res) => {
   try {
     const filter = {};
     if (req.query.country) {
-      filter.iso_3166_1 = req.query.country;
+      const country = String(req.query.country).trim();
+      if (country) {
+        filter.iso_3166_1 = new RegExp(`^${escapeRegExp(country)}$`, 'i');
+      }
     }
     if (req.query.tag) {
       const tag = String(req.query.tag).trim();
       if (tag) {
-        filter.tags = new RegExp(`(^|,\\s*)${escapeRegExp(tag)}(,|$)`, 'i');
+        filter.tags = new RegExp(escapeRegExp(tag), 'i');
+      }
+    }
+    if (req.query.name) {
+      const name = String(req.query.name).trim();
+      if (name) {
+        filter.name = new RegExp(escapeRegExp(name), 'i');
+      }
+    }
+    if (req.query.language) {
+      const language = String(req.query.language).trim();
+      if (language) {
+        filter.iso_639 = new RegExp(`^${escapeRegExp(language)}$`, 'i');
       }
     }
     const payload = await getStationsResponse(filter, req.query);
