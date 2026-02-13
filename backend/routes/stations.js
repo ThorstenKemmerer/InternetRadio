@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const Station = require('../models/Station');
-const { getCountryName } = require('../utils/countryLookup');
 
 const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const getStationTags = tags => (tags ? tags.split(',').map(tag => tag.trim()).filter(Boolean) : []);
@@ -53,12 +52,12 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get list of countries (ISO code + display name)
+// Get list of countries (ISO code + raw value)
 router.get('/countries', async (req, res) => {
   try {
     const codes = await Station.distinct('iso_3166_1');
     const filtered = codes.filter(Boolean).sort((a, b) => a.localeCompare(b));
-    res.json(filtered.map(code => ({ code, name: getCountryName(code) })));
+    res.json(filtered.map(code => ({ code, name: String(code).trim() })));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

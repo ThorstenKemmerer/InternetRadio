@@ -102,6 +102,9 @@
             <h3 class="text-lg font-semibold text-gray-800">
               {{ station.name }}
             </h3>
+            <div class="country-flag text-gray-600 text-sm">
+              {{ station.iso_3166_1 || 'N/A' }} · {{ station.iso_639 || 'N/A' }} 
+            </div>
             <div class="station-tags flex gap-2 flex-wrap">
               <span
                 v-for="tag in getStationTagsLimited(station)"
@@ -114,9 +117,6 @@
                 v-if="getStationTags(station).length === 0"
                 class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
               >Uncategorized</span>
-            </div>
-            <div class="country-flag text-gray-600 text-sm">
-              {{ formatIsoCode(station?.iso_3166_1) }}
             </div>
             <div class="station-homepage text-sm">
               <a
