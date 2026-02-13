@@ -84,4 +84,4 @@ jobs:
 
       - name: Smoke API
         run: |
-          curl -fS http://localhost:3000/api/stations | jq -e '. | type == "array"' >/dev/null
+          curl -fS http://localhost:3000/api/stations | jq -e '.stations | type == "array"' >/dev/null
