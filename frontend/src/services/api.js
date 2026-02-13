@@ -6,14 +6,16 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api' : 'http://localhost:3000/api');
 
 export const stationService = {
-  async getStations({ page = 1, limit = 50, tag = '', country = '' } = {}) {
+  async getStations({ page = 1, limit = 50, name = '', tag = '', country = '', language = '' } = {}) {
     try {
       const response = await axios.get(`${API_URL}/stations`, {
         params: {
           page,
           limit,
+          name: name || undefined,
           tag: tag || undefined,
-          country: country || undefined
+          country: country || undefined,
+          language: language || undefined
         }
       });
       return response.data;
