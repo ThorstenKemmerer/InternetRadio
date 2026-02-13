@@ -22,9 +22,12 @@
         <h2 class="text-2xl font-semibold neon-text">
           {{ currentStation.name }}
         </h2>
+        <div class="text-sm text-gray-600">
+          {{ currentStation.iso_3166_1 || 'N/A' }} · {{ currentStation.iso_639 || 'N/A' }} 
+        </div>
         <div class="station-tags flex gap-2 flex-wrap">
           <span
-            v-for="tag in getStationTagsLimited(currentStation)"
+            v-for="tag in getStationTags(currentStation)"
             :key="tag"
             class="genre-badge neon-badge px-2 py-0.5 rounded-full text-xs font-bold"
           >
@@ -36,9 +39,6 @@
           >
             Uncategorized
           </span>
-        </div>
-        <div class="text-sm text-gray-600">
-          {{ formatIsoCode(currentStation?.iso_3166_1) }}
         </div>
         <div class="text-sm">
           <a
@@ -131,9 +131,6 @@ export default {
         return [];
       }
       return station.tags.split(',').map(tag => tag.trim()).filter(Boolean);
-    },
-    getStationTagsLimited(station) {
-      return this.getStationTags(station).slice(0, 5);
     },
     formatIsoCode(value) {
       return value ? String(value).toUpperCase() : 'N/A';
