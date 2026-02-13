@@ -64,7 +64,8 @@ jobs:
         run: npm install
 
       - name: Start backend standalone
-        run: node backend/server-standalone.js &
+        run: npm run start:standalone > /tmp/backend.log 2>&1 &
+          echo $! > /tmp/backend.pid
 
       - name: Wait for server
         run: |
@@ -75,6 +76,8 @@ jobs:
             fi
             sleep 1
           done
+          echo 'server failed to start'
+          tail -n 200 /tmp/backend.log || true
           exit 1
 
       - name: Smoke API
