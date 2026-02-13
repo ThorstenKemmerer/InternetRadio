@@ -64,7 +64,9 @@ jobs:
         run: npm install
 
       - name: Start backend standalone
-        run: npm run start:standalone > /tmp/backend.log 2>&1 &
+        working-directory: backend
+        run: |
+          npm run start:standalone > /tmp/backend.log 2>&1 &
           echo $! > /tmp/backend.pid
 
       - name: Wait for server
